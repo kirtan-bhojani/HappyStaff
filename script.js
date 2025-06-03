@@ -1,131 +1,103 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-  // Initialize Feather Icons
-  feather.replace();
-
-  // Mobile Menu Toggle
-  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+document.addEventListener('DOMContentLoaded', () => {
+  const menuBtn = document.querySelector('.mobile-menu-btn');
   const navLinks = document.querySelector('.nav-links');
-
-  mobileMenuBtn.addEventListener('click', function() {
-    navLinks.classList.toggle('active');
-    this.setAttribute('aria-expanded', navLinks.classList.contains('active'));
-  });
-
-  // Close mobile menu when clicking on a link
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      mobileMenuBtn.setAttribute('aria-expanded', 'false');
-    });
-  });
-
-  // Dark Mode Toggle
   const darkModeToggle = document.getElementById('dark-mode-toggle');
-  const darkModeIcon = darkModeToggle.querySelector('i');
+  let darkModeIcon = darkModeToggle.querySelector('i');
 
-  // Check for saved user preference or use system preference
-  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  const currentTheme = localStorage.getItem('theme');
-
-  if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
-    document.body.classList.add('dark');
-    darkModeIcon.setAttribute('data-feather', 'moon');
+  // Initialize Feather icons
+  if (typeof feather !== 'undefined') {
     feather.replace();
+  } else {
+    console.warn('Feather icons not loaded');
+    // Fallback: Create a simple SVG if Feather fails
+    darkModeIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
   }
 
-  darkModeToggle.addEventListener('click', function() {
-    document.body.classList.toggle('dark');
-
-    if (document.body.classList.contains('dark')) {
-      localStorage.setItem('theme', 'dark');
-      darkModeIcon.setAttribute('data-feather', 'moon');
-    } else {
-      localStorage.setItem('theme', 'light');
-      darkModeIcon.setAttribute('data-feather', 'sun');
-    }
-
-    feather.replace();
-  });
-
-  // Pricing Tabs
-  const pricingTabs = document.querySelectorAll('.pricing-tab');
-
-  pricingTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      pricingTabs.forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-
-      // In a real implementation, you would update the pricing display here
-      // For this demo, we're just toggling the active class
+  // Mobile menu toggle
+  if (menuBtn && navLinks) {
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
     });
-  });
+  }
 
-  // FAQ Accordion
-  const faqItems = document.querySelectorAll('.faq-item');
-
-  faqItems.forEach(item => {
-    const question = item.querySelector('.faq-question');
-
-    question.addEventListener('click', function() {
-      item.classList.toggle('active');
-    });
-  });
-
-  // Smooth scrolling for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  // Smooth scroll for internal anchor links
+  document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
       e.preventDefault();
-
-      const targetId = this.getAttribute('href');
-      if (targetId === '#') return;
-
-      const targetElement = document.querySelector(targetId);
-      if (targetElement) {
-        const headerHeight = document.querySelector('header').offsetHeight;
-        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
-
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
+      if (navLinks) navLinks.classList.remove('open');
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
       }
     });
   });
 
-  // Demo form submission
-  const demoForm = document.querySelector('.demo-form');
-  if (demoForm) {
-    demoForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = this.querySelector('input').value;
+  // Function to set dark mode
+  function setDarkMode(isDark) {
+    try {
+      if (isDark) {
+        document.body.classList.add('dark');
+        if (darkModeIcon) darkModeIcon.setAttribute('data-feather', 'sun');
+      } else {
+        document.body.classList.remove('dark');
+        if (darkModeIcon) darkModeIcon.setAttribute('data-feather', 'moon');
+      }
+      // Try to replace icons, but don't fail if Feather isn't available
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+    } catch (e) {
+      console.error('Error setting dark mode:', e);
+    }
+  }
 
-      // Here you would typically send the data to your server
-      console.log('Demo requested for:', email);
+  // Load dark mode preference from localStorage
+  function loadDarkModePreference() {
+    try {
+      const savedDarkMode = localStorage.getItem('darkMode');
+      if (savedDarkMode === 'true') {
+        setDarkMode(true);
+      } else if (savedDarkMode === 'false') {
+        setDarkMode(false);
+      } else {
+        // Default to system preference if no saved preference
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setDarkMode(prefersDark);
+      }
+    } catch (e) {
+      console.error('Error loading dark mode preference:', e);
+      // Default to light mode if there's an error
+      setDarkMode(false);
+    }
+  }
 
-      // Show a success message
-      alert('Thank you! We will contact you shortly to schedule your demo.');
-      this.reset();
+  // Initialize dark mode
+  loadDarkModePreference();
+
+  // Dark mode toggle button event
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener('click', () => {
+      try {
+        const isDark = document.body.classList.contains('dark');
+        setDarkMode(!isDark);
+        localStorage.setItem('darkMode', !isDark);
+      } catch (e) {
+        console.error('Error toggling dark mode:', e);
+      }
     });
   }
 
-  // Animate elements when they come into view
-  const animateOnScroll = function() {
-    const elements = document.querySelectorAll('.fade-in');
-
-    elements.forEach(element => {
-      const elementPosition = element.getBoundingClientRect().top;
-      const windowHeight = window.innerHeight;
-
-      if (elementPosition < windowHeight - 100) {
-        element.style.animationPlayState = 'running';
+  // Watch for system color scheme changes
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      try {
+        // Only change if user hasn't explicitly set a preference
+        if (!localStorage.getItem('darkMode')) {
+          setDarkMode(e.matches);
+        }
+      } catch (e) {
+        console.error('Error handling system color scheme change:', e);
       }
     });
-  };
-
-  // Run once on load
-  animateOnScroll();
-
-  // And then on scroll
-  window.addEventListener('scroll', animateOnScroll);
+  }
 });
