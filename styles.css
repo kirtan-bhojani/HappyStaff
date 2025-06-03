@@ -669,6 +669,91 @@ body.dark .step:hover {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.2);
   }
+/* Comparison Table Section */
+.comparison {
+  padding: 6rem 0;
+  background-color: var(--color-bg-light);
+}
+
+body.dark .comparison {
+  background-color: var(--color-bg-dark-light);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body.dark .table-wrapper {
+  box-shadow: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  min-width: 600px;
+}
+
+thead {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+body.dark thead {
+  background-color: var(--color-primary-dark);
+}
+
+th, td {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+}
+
+body.dark th,
+body.dark td {
+  border-color: var(--color-border-dark);
+}
+
+th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+td {
+  color: var(--color-text);
+}
+
+body.dark td {
+  color: var(--color-text-dark);
+}
+
+tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+body.dark tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Check/X Icons */
+.icon-check,
+.icon-x {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+
+.icon-check {
+  color: var(--color-success);
+}
+
+.icon-x {
+  color: var(--color-error);
+}
 
   /* Testimonials Section */
   .testimonials {
